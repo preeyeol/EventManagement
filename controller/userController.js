@@ -1,0 +1,98 @@
+const userSchema = require("../model/userSchema");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const validator = require("validator");
+
+const register = async (req, res) => {
+  try {
+    const { username, email, password, confirmPassword, role } = req.body;
+    console.log(req.body);
+
+    if (validator.isEmail(email)) {
+      const user = await userSchema.findOne({ email: email });
+
+      if (user) {
+        return res.status(400).json({ error: "Email is already registered" });
+      }
+    } else {
+      res.json({ err: "Invalid email format" });
+    }
+
+    if (password !== confirmPassword) {
+      res.status(400).json({
+        msg: "Passwords do not match",
+      });
+    }
+    const usersname = await userSchema.findOne({ username: username });
+    if (usersname) {
+      return res.json({ msg: "Username already exist" });
+    }
+
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    const userAdd = new userSchema({
+      email: email,
+      username: username,
+      password: hashPassword,
+      role: role,
+    });
+
+    const newUser = await userAdd.save();
+
+    res.status(200).json({ msg: "You have Signed Up", newUser });
+  } catch (err) {
+    res.json({ msg: "Server Error" });
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await userSchema.findOne({ email: email }).select("+password");
+    if (!user) {
+      return res.status(400).json({ error: "User Not Found" });
+    }
+
+    const isCorrect = await bcrypt.compare(password, user.password);
+    if (!isCorrect) {
+      return res.status(400).json({
+        error: "Incorrect email or password",
+      });
+    }
+    const accessToken = jwt.sign({ id: user._id }, process.env.jwt_secret, {
+      issuer: process.env.jwt_issuer,
+      expiresIn: process.env.jwt_expiresIn,
+    });
+    res.status(200).json({
+      msg: "Login Succesful",
+      accessToken: accessToken,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({
+      msg: "Server Error",
+    });
+  }
+};
+
+const getAllUsers = async (req, res) => {
+  const user = await userSchema.find({});
+  res.json(user);
+};
+
+
+const adminUpdate= async(req,res)=>{
+
+const id=req.params.id
+
+const update= await userSchema.findById({_id:id})
+
+update.role=req.body.role
+
+await update.save();
+res.json({msg:"Role Updated"})
+
+}
+
+module.exports = { register, login, getAllUsers ,adminUpdate};
