@@ -3,6 +3,7 @@ const eventSchema = require("../model/eventSchema");
 const createEvent = async (req, res) => {
   try {
     const { name, description, date, location, maxAttendees } = req.body;
+    const user= req.user
 
     const event = await new eventSchema({
       name: name,
@@ -12,6 +13,7 @@ const createEvent = async (req, res) => {
       maxAttendees: maxAttendees,
     });
 
+    event.organizer.push(user._id)
     const newEvent = await event.save();
 
     res.status(200).json({
@@ -19,6 +21,7 @@ const createEvent = async (req, res) => {
       event: newEvent,
     });
   } catch (err) {
+    console.log(err)
     res.status(401).json({ Msg: "Server error" });
   }}
 
@@ -88,7 +91,7 @@ const leave = async (req, res) => {
   
 
   const getAllEvents= async(req,res)=>{
-const eventAll=await  eventSchema.find({}).populate({path:"attendees"
+const eventAll=await  eventSchema.find({}).populate({path:"attendees organizer",select:"username email"
 })
 res.json({msg:"Events",eventAll})
 }
