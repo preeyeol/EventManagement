@@ -92,7 +92,10 @@ update.role=req.body.role
 
 await update.save();
 res.json({msg:"Role Updated"})
-
 }
+
+
+
+
 
 module.exports = { register, login, getAllUsers ,adminUpdate};

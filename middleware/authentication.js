@@ -34,7 +34,7 @@ const authorizeTo = (...roles)=>{
      return next();
     }
     res.json({ msg: "Unauthorized" });
-  };
+};
   }
 
 module.exports={verifyToken,authorizeTo};

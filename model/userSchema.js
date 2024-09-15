@@ -4,7 +4,7 @@ const user=mongoose.Schema({
     username:{type:String,require:true},
     email: {type:String,require:true,unique:true},
     password: {type:String,require:true,select:false},
-    confirmPassword:{type:String},
+    confirmPassword:{type:String,require:true},
     role: {
       type: String,
       enum: ["admin", "organizer", "attendee"],
