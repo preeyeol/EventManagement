@@ -6,7 +6,7 @@ const event=  {
     date:{ type:Date,default:new Date},
     location: {type:String,required:true},
     maxAttendees: {type:Number,required:true},
-    organizer:[ { type: mongoose.Schema.Types.ObjectId, ref: "user" }],
+    organizer: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
     attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
   };
 
